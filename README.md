@@ -5,6 +5,14 @@
 
 This library binds `SOAP 1.1` and `SOAP 1.2` request messages to PSR-7 HTTP requests.
 
+## Requirement
+PHP 5.4
+
+## Install
+```
+composer install meng-tian/soap-http-binding
+```
+
 ## Usage
 
 ```php
