@@ -17,6 +17,7 @@ $request = $builder->isSOAP11()
     ->getSoapHttpRequest();
     
 // build a PSR-7 request that embedding a SOAP 1.2 request message
+$builder = new RequestBuilder();
 $request = $builder->isSOAP12()
     ->setEndpoint('http://www.endpoint.com')
     ->setSoapAction('http://www.soapaction.com')
@@ -24,8 +25,10 @@ $request = $builder->isSOAP12()
     ->getSoapHttpRequest();
 
 // build a PSR-7 GET request that support SOAP Response message exchange pattern
+$builder = new RequestBuilder();
 $request = $builder->isSOAP12()
     ->setEndpoint('http://www.endpoint.com')
+    ->setHttpMethod('GET')
     ->getSoapHttpRequest();
 ```
 
