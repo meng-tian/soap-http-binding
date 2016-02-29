@@ -12,6 +12,9 @@ use Zend\Diactoros\Stream;
  */
 class RequestBuilder
 {
+    const SOAP11 = '1.1';
+    const SOAP12 = '1.2';
+
     /**
      * @var string
      */
@@ -19,7 +22,7 @@ class RequestBuilder
     /**
      * @var string
      */
-    private $soapVersion = '1.1';
+    private $soapVersion = self::SOAP11;
     /**
      * @var string
      */
@@ -60,14 +63,20 @@ class RequestBuilder
     }
 
     /**
-     * @param string $version
      * @return self
      */
-    public function setVersion($version)
+    public function isSOAP11()
     {
-        $this->soapVersion = $version;
+        $this->soapVersion = self::SOAP11;
         return $this;
     }
+
+    public function isSOAP12()
+    {
+        $this->soapVersion = self::SOAP12;
+        return $this;
+    }
+
 
     /**
      * @param string $soapAction
@@ -107,7 +116,7 @@ class RequestBuilder
             $isValid = false;
         }
 
-        if (!in_array($this->soapVersion, ['1.1', '1.2'])) {
+        if (!$this->soapMessage && $this->httpMethod != 'GET') {
             $isValid = false;
         }
 
@@ -115,7 +124,7 @@ class RequestBuilder
          * SOAP 1.1 only defines HTTP binding with POST method.
          * @link https://www.w3.org/TR/2000/NOTE-SOAP-20000508/#_Toc478383527
          */
-        if ($this->soapVersion == '1.1' && $this->httpMethod != 'POST') {
+        if ($this->soapVersion == self::SOAP11 && $this->httpMethod != 'POST') {
             $isValid = false;
         }
 
@@ -123,7 +132,7 @@ class RequestBuilder
          * SOAP 1.2 only defines HTTP binding with POST and GET methods.
          * @link https://www.w3.org/TR/2007/REC-soap12-part0-20070427/#L10309
          */
-        if ($this->soapVersion == '1.2' && !in_array($this->httpMethod, ['GET', 'POST'])) {
+        if ($this->soapVersion == self::SOAP12 && !in_array($this->httpMethod, ['GET', 'POST'])) {
             $isValid = false;
         }
 
@@ -137,7 +146,7 @@ class RequestBuilder
      */
     private function prepareHeaders()
     {
-        if ($this->soapVersion == '1.1') {
+        if ($this->soapVersion == self::SOAP11) {
             return $this->prepareSoap11Headers();
         } else {
             return $this->prepareSoap12Headers();
@@ -180,10 +189,10 @@ class RequestBuilder
      */
     private function prepareMessage()
     {
-        if ($this->httpMethod == 'GET') {
-            return new Stream(fopen('php://temp', 'r'));
-        } else {
+        if ($this->httpMethod == 'POST') {
             return $this->soapMessage;
+        } else {
+            return new Stream(fopen('php://temp', 'r'));
         }
     }
 }
