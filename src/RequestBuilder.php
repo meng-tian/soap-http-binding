@@ -1,0 +1,189 @@
+<?php
+
+namespace Meng\Soap\HttpBinding;
+
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
+use Zend\Diactoros\Request;
+use Zend\Diactoros\Stream;
+
+/**
+ * This class create PSR HTTP requests that embed SOAP messages.
+ */
+class RequestBuilder
+{
+    /**
+     * @var string
+     */
+    private $endpoint;
+    /**
+     * @var string
+     */
+    private $soapVersion = '1.1';
+    /**
+     * @var string
+     */
+    private $soapAction = '';
+    /**
+     * @var StreamInterface
+     */
+    private $soapMessage;
+    /**
+     * @var string
+     */
+    private $httpMethod = 'POST';
+
+    /**
+     * @return RequestInterface
+     */
+    public function getSoapHttpRequest()
+    {
+        $this->validate();
+        $headers = $this->prepareHeaders();
+        $message = $this->prepareMessage();
+        return new Request(
+            $this->endpoint,
+            $this->httpMethod,
+            $message,
+            $headers
+        );
+    }
+
+    /**
+     * @param string $endpoint
+     * @return self
+     */
+    public function setEndpoint($endpoint)
+    {
+        $this->endpoint = $endpoint;
+        return $this;
+    }
+
+    /**
+     * @param string $version
+     * @return self
+     */
+    public function setVersion($version)
+    {
+        $this->soapVersion = $version;
+        return $this;
+    }
+
+    /**
+     * @param string $soapAction
+     * @return self
+     */
+    public function setSoapAction($soapAction)
+    {
+        $this->soapAction = $soapAction;
+        return $this;
+    }
+
+    /**
+     * @param StreamInterface $message
+     * @return self
+     */
+    public function setSoapMessage($message)
+    {
+        $this->soapMessage = $message;
+        return $this;
+    }
+
+    /**
+     * @param string $method
+     * @return self
+     */
+    public function setHttpMethod($method)
+    {
+        $this->httpMethod = $method;
+        return $this;
+    }
+
+    private function validate()
+    {
+        $isValid = true;
+
+        if (!$this->endpoint) {
+            $isValid = false;
+        }
+
+        if (!in_array($this->soapVersion, ['1.1', '1.2'])) {
+            $isValid = false;
+        }
+
+        /**
+         * SOAP 1.1 only defines HTTP binding with POST method.
+         * @link https://www.w3.org/TR/2000/NOTE-SOAP-20000508/#_Toc478383527
+         */
+        if ($this->soapVersion == '1.1' && $this->httpMethod != 'POST') {
+            $isValid = false;
+        }
+
+        /**
+         * SOAP 1.2 only defines HTTP binding with POST and GET methods.
+         * @link https://www.w3.org/TR/2007/REC-soap12-part0-20070427/#L10309
+         */
+        if ($this->soapVersion == '1.2' && !in_array($this->httpMethod, ['GET', 'POST'])) {
+            $isValid = false;
+        }
+
+        if (!$isValid) {
+            throw new RequestException;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function prepareHeaders()
+    {
+        if ($this->soapVersion == '1.1') {
+            return $this->prepareSoap11Headers();
+        } else {
+            return $this->prepareSoap12Headers();
+        }
+    }
+
+    /**
+     * @link https://www.w3.org/TR/2000/NOTE-SOAP-20000508/#_Toc478383526
+     * @return array
+     */
+    private function prepareSoap11Headers()
+    {
+        $headers = [];
+        $headers['Content-Length'] = strlen($this->soapMessage->getContents());
+        $headers['SOAPAction'] = $this->soapAction;
+        $headers['Content-Type'] = 'text/xml; charset="utf-8"';
+        return $headers;
+    }
+
+    /**
+     * SOSPAction header is removed in SOAP 1.2 and now expressed as a value of
+     * an (optional) "action" parameter of the "application/soap+xml" media type.
+     * @link https://www.w3.org/TR/soap12-part0/#L4697
+     * @return array
+     */
+    private function prepareSoap12Headers()
+    {
+        $headers = [];
+        if ($this->httpMethod == 'POST') {
+            $headers['Content-Length'] = strlen($this->soapMessage->getContents());
+            $headers['Content-Type'] = 'application/soap+xml; charset="utf-8"' . '; action="' . $this->soapAction . '"';
+        } else {
+            $headers['Accept'] = 'text/html;q=0.5, application/soap+xml';
+        }
+        return $headers;
+    }
+
+    /**
+     * @return StreamInterface
+     */
+    private function prepareMessage()
+    {
+        if ($this->httpMethod == 'GET') {
+            return new Stream(fopen('php://temp', 'r'));
+        } else {
+            return $this->soapMessage;
+        }
+    }
+}
