@@ -170,7 +170,7 @@ class RequestBuilder
             $headers['Content-Length'] = strlen($this->soapMessage->getContents());
             $headers['Content-Type'] = 'application/soap+xml; charset="utf-8"' . '; action="' . $this->soapAction . '"';
         } else {
-            $headers['Accept'] = 'text/html;q=0.5, application/soap+xml';
+            $headers['Accept'] = 'application/soap+xml';
         }
         return $headers;
     }
