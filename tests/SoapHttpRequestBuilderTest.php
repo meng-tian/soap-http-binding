@@ -11,8 +11,8 @@ class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
     public function soap11Request()
     {
         $builder = new RequestBuilder();
-        $request = $builder->setEndpoint('http://www.endpoint.com')
-            ->isSOAP11()
+        $request = $builder->isSOAP11()
+            ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
             ->setSoapMessage(new Stream(fopen('php://temp', 'r')))
             ->getSoapHttpRequest();
@@ -32,10 +32,10 @@ class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
     public function soap11RequestHttpGetBinding()
     {
         $builder = new RequestBuilder();
-        $builder->setEndpoint('http://www.endpoint.com')
+        $builder->setHttpMethod('GET')
+            ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
             ->setSoapMessage(new Stream(fopen('php://temp', 'r')))
-            ->setHttpMethod('GET')
             ->getSoapHttpRequest();
     }
 
@@ -45,9 +45,9 @@ class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
     public function soap12Request()
     {
         $builder = new RequestBuilder();
-        $request = $builder->setEndpoint('http://www.endpoint.com')
+        $request = $builder->isSOAP12()
+            ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
-            ->isSOAP12()
             ->setSoapMessage(new Stream(fopen('php://temp', 'r')))
             ->getSoapHttpRequest();
 
@@ -66,9 +66,9 @@ class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
     public function soap12RequestPutMethod()
     {
         $builder = new RequestBuilder();
-        $builder->setEndpoint('http://www.endpoint.com')
+        $builder->isSOAP12()
+            ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
-            ->isSOAP12()
             ->setHttpMethod('PUT')
             ->setSoapMessage(new Stream(fopen('php://temp', 'r')))
             ->getSoapHttpRequest();
@@ -82,10 +82,10 @@ class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
         $stream = fopen('php://temp', 'w');
         fwrite($stream, 'some string');
         $builder = new RequestBuilder();
-        $request = $builder->setEndpoint('http://www.endpoint.com')
-            ->setSoapAction('http://www.soapaction.com')
-            ->isSOAP12()
+        $request = $builder->isSOAP12()
             ->setHttpMethod('GET')
+            ->setEndpoint('http://www.endpoint.com')
+            ->setSoapAction('http://www.soapaction.com')
             ->setSoapMessage(new Stream($stream, 'r'))
             ->getSoapHttpRequest();
 

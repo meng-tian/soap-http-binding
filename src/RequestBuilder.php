@@ -32,6 +32,10 @@ class RequestBuilder
      */
     private $soapMessage;
     /**
+     * @var bool
+     */
+    private $hasSoapMessage = false;
+    /**
      * @var string
      */
     private $httpMethod = 'POST';
@@ -44,12 +48,14 @@ class RequestBuilder
         $this->validate();
         $headers = $this->prepareHeaders();
         $message = $this->prepareMessage();
-        return new Request(
+        $request = new Request(
             $this->endpoint,
             $this->httpMethod,
             $message,
             $headers
         );
+        $this->unsetAll();
+        return $request;
     }
 
     /**
@@ -95,6 +101,7 @@ class RequestBuilder
     public function setSoapMessage($message)
     {
         $this->soapMessage = $message;
+        $this->hasSoapMessage = true;
         return $this;
     }
 
@@ -116,7 +123,7 @@ class RequestBuilder
             $isValid = false;
         }
 
-        if (!$this->soapMessage && $this->httpMethod == 'POST') {
+        if (!$this->hasSoapMessage && $this->httpMethod == 'POST') {
             $isValid = false;
         }
 
@@ -194,5 +201,14 @@ class RequestBuilder
         } else {
             return new Stream(fopen('php://temp', 'r'));
         }
+    }
+
+    private function unsetAll()
+    {
+        unset($this->endpoint);
+        $this->soapAction = '';
+        $this->soapVersion = SOAP_1_1;
+        $this->hasSoapMessage = false;
+        $this->httpMethod = 'POST';
     }
 }
