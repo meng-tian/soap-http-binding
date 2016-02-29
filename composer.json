@@ -1,6 +1,7 @@
 {
     "name": "meng-tian/soap-http-binding",
-    "description": "A PHP library for binding SOAP messages to HTTP.",
+    "description": "A PHP library for binding SOAP messages to PSR-7 HTTP requests.",
+    "keywords": ["SOAP", "HTTP", "PSR-7"]
     "license": "MIT",
     "authors": [
         {
