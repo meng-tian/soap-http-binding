@@ -116,7 +116,7 @@ class RequestBuilder
             $isValid = false;
         }
 
-        if (!$this->soapMessage && $this->httpMethod != 'GET') {
+        if (!$this->soapMessage && $this->httpMethod == 'POST') {
             $isValid = false;
         }
 
