@@ -123,19 +123,6 @@ class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
      * @test
      * @expectedException Meng\Soap\HttpBinding\RequestException
      */
-    public function soapMessageNotStream()
-    {
-        $builder = new RequestBuilder();
-        $builder->setEndpoint('http://www.endpoint.com')
-            ->setSoapAction('http://www.soapaction.com')
-            ->setSoapMessage('a soap message')
-            ->getSoapHttpRequest();
-    }
-
-    /**
-     * @test
-     * @expectedException Meng\Soap\HttpBinding\RequestException
-     */
     public function resetAllAfterFailure()
     {
         $builder = new RequestBuilder();

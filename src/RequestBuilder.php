@@ -98,7 +98,7 @@ class RequestBuilder
      * @param StreamInterface $message
      * @return self
      */
-    public function setSoapMessage($message)
+    public function setSoapMessage(StreamInterface $message)
     {
         $this->soapMessage = $message;
         $this->hasSoapMessage = true;
@@ -124,10 +124,6 @@ class RequestBuilder
         }
 
         if (!$this->hasSoapMessage && $this->httpMethod == 'POST') {
-            $isValid = false;
-        }
-
-        if ($this->hasSoapMessage && !$this->soapMessage instanceof StreamInterface) {
             $isValid = false;
         }
 
