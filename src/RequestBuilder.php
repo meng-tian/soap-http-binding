@@ -127,6 +127,10 @@ class RequestBuilder
             $isValid = false;
         }
 
+        if ($this->hasSoapMessage && !$this->soapMessage instanceof StreamInterface) {
+            $isValid = false;
+        }
+
         /**
          * SOAP 1.1 only defines HTTP binding with POST method.
          * @link https://www.w3.org/TR/2000/NOTE-SOAP-20000508/#_Toc478383527
@@ -144,6 +148,7 @@ class RequestBuilder
         }
 
         if (!$isValid) {
+            $this->unsetAll();
             throw new RequestException;
         }
     }
@@ -205,10 +210,13 @@ class RequestBuilder
 
     private function unsetAll()
     {
-        unset($this->endpoint);
+        $this->endpoint = null;
+        if ($this->hasSoapMessage) {
+            $this->soapMessage = null;
+            $this->hasSoapMessage = false;
+        }
         $this->soapAction = '';
-        $this->soapVersion = SOAP_1_1;
-        $this->hasSoapMessage = false;
+        $this->soapVersion = self::SOAP11;
         $this->httpMethod = 'POST';
     }
 }

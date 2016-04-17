@@ -1,6 +1,7 @@
 <?php
 
 use Meng\Soap\HttpBinding\RequestBuilder;
+use Meng\Soap\HttpBinding\RequestException;
 use Zend\Diactoros\Stream;
 
 class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
@@ -116,5 +117,32 @@ class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
     {
         $builder = new RequestBuilder();
         $builder->setEndpoint('http://www.endpoint.com')->getSoapHttpRequest();
+    }
+
+    /**
+     * @test
+     * @expectedException Meng\Soap\HttpBinding\RequestException
+     */
+    public function soapMessageNotStream()
+    {
+        $builder = new RequestBuilder();
+        $builder->setEndpoint('http://www.endpoint.com')
+            ->setSoapAction('http://www.soapaction.com')
+            ->setSoapMessage('a soap message')
+            ->getSoapHttpRequest();
+    }
+
+    /**
+     * @test
+     * @expectedException Meng\Soap\HttpBinding\RequestException
+     */
+    public function resetAllAfterFailure()
+    {
+        $builder = new RequestBuilder();
+        try {
+            $builder->isSOAP12()->setEndpoint('http://www.endpoint.com')->getSoapHttpRequest();
+        } catch (RequestException $e) {
+        }
+        $builder->setHttpMethod('GET')->getSoapHttpRequest();
     }
 }
