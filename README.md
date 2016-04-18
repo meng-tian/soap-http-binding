@@ -55,7 +55,7 @@ fseek($stream, 0);
 $stream = new Stream($stream);
 $response = new Response($stream, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
 $response = $httpBinding->response($response, 'GetAirportInformationByCountry');
-$this->assertObjectHasAttribute('GetAirportInformationByCountryResult', $response);
+print_r($response);
 ```
 Output:
 ```
