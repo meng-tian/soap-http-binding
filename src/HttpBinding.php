@@ -49,10 +49,10 @@ class HttpBinding
      *
      * @param ResponseInterface $response
      * @param $name
-     * @param null $output_headers
+     * @param array|null $output_headers
      * @return mixed
      */
-    public function response(ResponseInterface $response, $name, &$output_headers = null)
+    public function response(ResponseInterface $response, $name, array &$output_headers = null)
     {
         return $this->interpreter->response($response->getBody()->__toString(), $name, $output_headers);
     }
