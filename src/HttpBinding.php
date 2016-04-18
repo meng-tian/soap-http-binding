@@ -30,7 +30,7 @@ class HttpBinding
         }
         $this->builder->setEndpoint($soapRequest->getEndpoint());
         $this->builder->setSoapAction($soapRequest->getSoapAction());
-        $stream = fopen('php://temp', 'r');
+        $stream = fopen('php://temp', 'r+');
         fwrite($stream, $soapRequest->getSoapMessage());
         fseek($stream, 0);
         $this->builder->setSoapMessage(new Stream($stream));
