@@ -4,7 +4,7 @@ use Meng\Soap\HttpBinding\RequestBuilder;
 use Meng\Soap\HttpBinding\RequestException;
 use Zend\Diactoros\Stream;
 
-class SoapHttpRequestBuilderTest extends PHPUnit_Framework_TestCase
+class RequestBuilderTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @test

@@ -4,6 +4,7 @@ namespace Meng\Soap\HttpBinding;
 
 use Meng\Soap\Interpreter;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Stream;
 
 class HttpBinding
@@ -18,9 +19,15 @@ class HttpBinding
     }
 
     /**
+     * Embed SOAP messages in PSR-7 HTTP Requests
+     *
+     * @param $name
+     * @param array $arguments
+     * @param array|null $options
+     * @param null $inputHeaders
      * @return RequestInterface
      */
-    public function toHttpRequest($name, array $arguments, array $options = null, $inputHeaders = null)
+    public function request($name, array $arguments, array $options = null, $inputHeaders = null)
     {
         $soapRequest = $this->interpreter->request($name, $arguments, $options, $inputHeaders);
         if ($soapRequest->getSoapVersion() == '1') {
@@ -38,10 +45,15 @@ class HttpBinding
     }
 
     /**
+     * Retrieve SOAP messages from PSR-7 HTTP responses
+     *
+     * @param ResponseInterface $response
+     * @param $name
+     * @param null $output_headers
      * @return mixed
      */
-    public function fromHttpResponse($response, $name, &$output_headers = null)
+    public function response(ResponseInterface $response, $name, &$output_headers = null)
     {
-        return $this->interpreter->response($response, $name, $output_headers);
+        return $this->interpreter->response($response->getBody()->__toString(), $name, $output_headers);
     }
 }
