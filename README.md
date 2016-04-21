@@ -16,7 +16,11 @@ composer install meng-tian/soap-http-binding
 ## Usage
 `HttpBinding::request` embeds SOAP reqeust messages into PSR-7 HTTP requests.
 ```php
-$interpreter = new Interpreter('http://www.webservicex.net/airport.asmx?WSDL', ['soap_version' => SOAP_1_1]);
+use Meng\Soap\HttpBinding\HttpBinding;
+use Meng\Soap\HttpBinding\RequestBuilder;
+use Meng\Soap\Interpreter;
+
+$interpreter = new Interpreter('http://www.webservicex.net/airport.asmx?WSDL');
 $builder = new RequestBuilder();
 $httpBinding = new HttpBinding($interpreter, $builder);
 
@@ -39,6 +43,12 @@ Host: www.webservicex.net
 
 `HttpBinding::response` retrieves SOAP response messages from PSR-7 HTTP responses: 
 ```php
+use Meng\Soap\HttpBinding\HttpBinding;
+use Meng\Soap\HttpBinding\RequestBuilder;
+use Meng\Soap\Interpreter;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\Stream;
+
 $response = <<<EOD
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -49,12 +59,17 @@ $response = <<<EOD
   </soap:Body>
 </soap:Envelope>
 EOD;
-$stream = fopen('php://memory', 'r+');
-fwrite($stream, $response);
-fseek($stream, 0);
-$stream = new Stream($stream);
+
+$stream = new Stream('php://memory', 'r+');
+$stream->write($response);
+$stream->rewind();
 $response = new Response($stream, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
+
+$interpreter = new Interpreter('http://www.webservicex.net/airport.asmx?WSDL');
+$builder = new RequestBuilder();
+$httpBinding = new HttpBinding($interpreter, $builder);
 $response = $httpBinding->response($response, 'GetAirportInformationByCountry');
+
 print_r($response);
 ```
 Output:
@@ -68,6 +83,8 @@ stdClass Object
 
 This library also support `SOAP 1.2` HTTP GET binding through `RequestBuilder` class :
 ```php
+use Meng\Soap\HttpBinding\RequestBuilder;
+
 $builder = new RequestBuilder();
 $request = $builder->isSOAP12()
     ->setEndpoint('http://www.endpoint.com')
