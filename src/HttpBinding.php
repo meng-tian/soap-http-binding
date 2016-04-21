@@ -21,10 +21,10 @@ class HttpBinding
     /**
      * Embed SOAP messages in PSR-7 HTTP Requests
      *
-     * @param $name
+     * @param string $name
      * @param array $arguments
-     * @param array|null $options
-     * @param null $inputHeaders
+     * @param array $options
+     * @param mixed $inputHeaders
      * @return RequestInterface
      */
     public function request($name, array $arguments, array $options = null, $inputHeaders = null)
@@ -37,10 +37,10 @@ class HttpBinding
         }
         $this->builder->setEndpoint($soapRequest->getEndpoint());
         $this->builder->setSoapAction($soapRequest->getSoapAction());
-        $stream = fopen('php://temp', 'r+');
-        fwrite($stream, $soapRequest->getSoapMessage());
-        fseek($stream, 0);
-        $this->builder->setSoapMessage(new Stream($stream));
+        $stream = new Stream('php://temp', 'r+');
+        $stream->write($soapRequest->getSoapMessage());
+        $stream->rewind();
+        $this->builder->setSoapMessage($stream);
         return $this->builder->getSoapHttpRequest();
     }
 
@@ -48,12 +48,13 @@ class HttpBinding
      * Retrieve SOAP messages from PSR-7 HTTP responses
      *
      * @param ResponseInterface $response
-     * @param $name
-     * @param array|null $output_headers
+     * @param string $name
+     * @param array $outputHeaders
      * @return mixed
+     * @throws \SoapFault
      */
-    public function response(ResponseInterface $response, $name, array &$output_headers = null)
+    public function response(ResponseInterface $response, $name, array &$outputHeaders = null)
     {
-        return $this->interpreter->response($response->getBody()->__toString(), $name, $output_headers);
+        return $this->interpreter->response($response->getBody()->__toString(), $name, $outputHeaders);
     }
 }
