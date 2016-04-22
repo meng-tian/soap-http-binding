@@ -42,6 +42,7 @@ class RequestBuilder
 
     /**
      * @return RequestInterface
+     * @throws RequestException
      */
     public function getSoapHttpRequest()
     {

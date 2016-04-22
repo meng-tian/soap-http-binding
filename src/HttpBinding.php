@@ -26,6 +26,7 @@ class HttpBinding
      * @param array $options
      * @param mixed $inputHeaders
      * @return RequestInterface
+     * @throws RequestException if SOAP HTTP binding failed using the given parameters.
      */
     public function request($name, array $arguments, array $options = null, $inputHeaders = null)
     {
@@ -37,11 +38,18 @@ class HttpBinding
         }
         $this->builder->setEndpoint($soapRequest->getEndpoint());
         $this->builder->setSoapAction($soapRequest->getSoapAction());
+
         $stream = new Stream('php://temp', 'r+');
         $stream->write($soapRequest->getSoapMessage());
         $stream->rewind();
         $this->builder->setSoapMessage($stream);
-        return $this->builder->getSoapHttpRequest();
+
+        try {
+            return $this->builder->getSoapHttpRequest();
+        } catch (RequestException $exception) {
+            $stream->close();
+            throw $exception;
+        }
     }
 
     /**
@@ -51,7 +59,7 @@ class HttpBinding
      * @param string $name
      * @param array $outputHeaders
      * @return mixed
-     * @throws \SoapFault
+     * @throws \SoapFault if the underlying SOAP interpreter throw \SoapFault with the given HTTP response.
      */
     public function response(ResponseInterface $response, $name, array &$outputHeaders = null)
     {

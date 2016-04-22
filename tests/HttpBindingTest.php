@@ -2,6 +2,7 @@
 
 use Meng\Soap\HttpBinding\HttpBinding;
 use Meng\Soap\HttpBinding\RequestBuilder;
+use Meng\Soap\HttpBinding\RequestException;
 use Meng\Soap\Interpreter;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Stream;
@@ -30,10 +31,10 @@ class HttpBindingTest extends PHPUnit_Framework_TestCase
   </soap:Body>
 </soap:Envelope>
 EOD;
-        $stream = fopen('php://memory', 'r+');
-        fwrite($stream, $response);
-        fseek($stream, 0);
-        $stream = new Stream($stream);
+
+        $stream = new Stream('php://memory', 'r+');
+        $stream->write($response);
+        $stream->rewind();
         $response = new Response($stream, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
         $response = $httpBinding->response($response, 'GetAirportInformationByCountry');
         $this->assertObjectHasAttribute('GetAirportInformationByCountryResult', $response);
@@ -61,12 +62,28 @@ EOD;
   </soap12:Body>
 </soap12:Envelope>
 EOD;
-        $stream = fopen('php://memory', 'r+');
-        fwrite($stream, $response);
-        fseek($stream, 0);
-        $stream = new Stream($stream);
+
+        $stream = new Stream('php://memory', 'r+');
+        $stream->write($response);
+        $stream->rewind();
         $response = new Response($stream, 200, ['Content-Type' => 'Content-Type: application/soap+xml; charset=utf-8']);
         $response = $httpBinding->response($response, 'GetInfoByCity');
         $this->assertObjectHasAttribute('GetInfoByCityResult', $response);
+    }
+
+    /**
+     * @test
+     * @expectedException Meng\Soap\HttpBinding\RequestException
+     */
+    public function requestBindingFailed()
+    {
+        $interpreter = new Interpreter(null, ['uri' => '', 'location' => '']);
+        $builderMock = $this->getMockBuilder('Meng\Soap\HttpBinding\RequestBuilder')
+            ->setMethods(['getSoapHttpRequest'])
+            ->getMock();
+        $builderMock->method('getSoapHttpRequest')->willThrowException(new RequestException());
+
+        $httpBinding = new HttpBinding($interpreter, $builderMock);
+        $httpBinding->request('some-function', []);
     }
 }
