@@ -59,7 +59,7 @@ class HttpBinding
      * @param string $name
      * @param array $outputHeaders
      * @return mixed
-     * @throws \SoapFault if the underlying SOAP interpreter throw \SoapFault with the given HTTP response.
+     * @throws \SoapFault if the underlying SOAP interpreter throws \SoapFault.
      */
     public function response(ResponseInterface $response, $name, array &$outputHeaders = null)
     {
