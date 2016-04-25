@@ -201,7 +201,7 @@ class RequestBuilder
         if ($this->httpMethod == 'POST') {
             return $this->soapMessage;
         } else {
-            return new Stream(fopen('php://temp', 'r'));
+            return new Stream('php://temp', 'r');
         }
     }
 
