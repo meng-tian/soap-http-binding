@@ -21,12 +21,15 @@ class HttpBinding
     /**
      * Embed SOAP messages in PSR-7 HTTP Requests
      *
-     * @param string $name
-     * @param array $arguments
-     * @param array $options
-     * @param mixed $inputHeaders
+     * @param string $name              The name of the SOAP function to bind.
+     * @param array  $arguments         An array of the arguments to the SOAP function.
+     * @param array  $options           An associative array of options.
+     *                                  The location option is the URL of the remote Web service.
+     *                                  The uri option is the target namespace of the SOAP service.
+     *                                  The soapaction option is the action to call.
+     * @param mixed $inputHeaders       An array of headers to be bound along with the SOAP request.
      * @return RequestInterface
-     * @throws RequestException if SOAP HTTP binding failed using the given parameters.
+     * @throws RequestException         If SOAP HTTP binding failed using the given parameters.
      */
     public function request($name, array $arguments, array $options = null, $inputHeaders = null)
     {
@@ -56,10 +59,11 @@ class HttpBinding
      * Retrieve SOAP messages from PSR-7 HTTP responses
      *
      * @param ResponseInterface $response
-     * @param string $name
-     * @param array $outputHeaders
+     * @param string            $name               The name of the SOAP function to unbind.
+     * @param array             $outputHeaders      If supplied, this array will be filled with the headers from
+     *                                              the SOAP response.
      * @return mixed
-     * @throws \SoapFault if the underlying SOAP interpreter throws \SoapFault.
+     * @throws \SoapFault                           If the underlying SOAP interpreter throws \SoapFault.
      */
     public function response(ResponseInterface $response, $name, array &$outputHeaders = null)
     {
