@@ -56,14 +56,14 @@ class HttpBinding
     }
 
     /**
-     * Retrieve SOAP messages from PSR-7 HTTP responses
+     * Retrieve SOAP messages from PSR-7 HTTP responses and interpret messages to PHP values.
      *
      * @param ResponseInterface $response
      * @param string            $name               The name of the SOAP function to unbind.
      * @param array             $outputHeaders      If supplied, this array will be filled with the headers from
      *                                              the SOAP response.
      * @return mixed
-     * @throws \SoapFault                           If the underlying SOAP interpreter throws \SoapFault.
+     * @throws \SoapFault                           If the SOAP message contains SOAP faults.
      */
     public function response(ResponseInterface $response, $name, array &$outputHeaders = null)
     {
