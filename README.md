@@ -7,7 +7,7 @@ PHP 5.4
 
 ## Install
 ```
-composer install meng-tian/soap-http-binding
+composer require meng-tian/soap-http-binding
 ```
 
 ## Usage
