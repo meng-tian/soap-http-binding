@@ -67,6 +67,6 @@ class HttpBinding
      */
     public function response(ResponseInterface $response, $name, array &$outputHeaders = null)
     {
-        return $this->interpreter->response($response->getBody()->__toString(), $name, $outputHeaders);
+        return $this->interpreter->response($response->getBody()->getContents(), $name, $outputHeaders);
     }
 }
