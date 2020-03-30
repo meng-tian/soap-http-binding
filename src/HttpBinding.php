@@ -5,7 +5,7 @@ namespace Meng\Soap\HttpBinding;
 use Meng\Soap\Interpreter;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Stream;
+use Laminas\Diactoros\Stream;
 
 class HttpBinding
 {

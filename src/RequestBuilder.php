@@ -4,8 +4,8 @@ namespace Meng\Soap\HttpBinding;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
-use Zend\Diactoros\Request;
-use Zend\Diactoros\Stream;
+use Laminas\Diactoros\Request;
+use Laminas\Diactoros\Stream;
 
 /**
  * This class create PSR HTTP requests that embed SOAP messages.
