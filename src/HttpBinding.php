@@ -2,10 +2,10 @@
 
 namespace Meng\Soap\HttpBinding;
 
+use Laminas\Diactoros\Stream;
 use Meng\Soap\Interpreter;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Stream;
 
 class HttpBinding
 {
