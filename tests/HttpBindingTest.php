@@ -14,7 +14,7 @@ class HttpBindingTest extends PHPUnit_Framework_TestCase
      */
     public function soap11()
     {
-        $interpreter = new Interpreter('http://www.webservicex.net/airport.asmx?WSDL', ['soap_version' => SOAP_1_1]);
+        $interpreter = new Interpreter(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wsdl' . DIRECTORY_SEPARATOR . 'airport.wsdl', ['soap_version' => SOAP_1_1]);
         $builder = new RequestBuilder();
         $httpBinding = new HttpBinding($interpreter, $builder);
 
@@ -45,7 +45,7 @@ EOD;
      */
     public function soap12()
     {
-        $interpreter = new Interpreter('http://www.webservicex.net/uszip.asmx?WSDL', ['soap_version' => SOAP_1_2]);
+        $interpreter = new Interpreter(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wsdl' . DIRECTORY_SEPARATOR . 'uszip.wsdl', ['soap_version' => SOAP_1_2]);
         $builder = new RequestBuilder();
         $httpBinding = new HttpBinding($interpreter, $builder);
 
