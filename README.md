@@ -3,7 +3,7 @@
 This library binds `SOAP 1.1` and `SOAP 1.2` messages to PSR-7 HTTP messages.
 
 ## Requirement
-PHP 5.4
+PHP 5.6
 
 ## Install
 ```
