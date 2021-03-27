@@ -2,16 +2,19 @@
 
 use Meng\Soap\HttpBinding\RequestBuilder;
 use Meng\Soap\HttpBinding\RequestException;
-use Zend\Diactoros\Stream;
+use Laminas\Diactoros\Stream;
+use Laminas\Diactoros\RequestFactory;
+use Laminas\Diactoros\StreamFactory;
+use PHPUnit\Framework\TestCase;
 
-class RequestBuilderTest extends PHPUnit_Framework_TestCase
+class RequestBuilderTest extends TestCase
 {
     /**
      * @test
      */
     public function soap11Request()
     {
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
         $request = $builder->isSOAP11()
             ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
@@ -28,11 +31,11 @@ class RequestBuilderTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException Meng\Soap\HttpBinding\RequestException
      */
     public function soap11RequestHttpGetBinding()
     {
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
+        $this->expectException('Meng\Soap\HttpBinding\RequestException');
         $builder->setHttpMethod('GET')
             ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
@@ -45,7 +48,7 @@ class RequestBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function soap12Request()
     {
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
         $request = $builder->isSOAP12()
             ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
@@ -62,11 +65,11 @@ class RequestBuilderTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException Meng\Soap\HttpBinding\RequestException
      */
     public function soap12RequestPutMethod()
     {
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
+        $this->expectException('Meng\Soap\HttpBinding\RequestException');
         $builder->isSOAP12()
             ->setEndpoint('http://www.endpoint.com')
             ->setSoapAction('http://www.soapaction.com')
@@ -82,7 +85,7 @@ class RequestBuilderTest extends PHPUnit_Framework_TestCase
     {
         $stream = fopen('php://temp', 'w');
         fwrite($stream, 'some string');
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
         $request = $builder->isSOAP12()
             ->setHttpMethod('GET')
             ->setEndpoint('http://www.endpoint.com')
@@ -101,35 +104,35 @@ class RequestBuilderTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException Meng\Soap\HttpBinding\RequestException
      */
     public function soapNoEndpoint()
     {
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
+        $this->expectException('Meng\Soap\HttpBinding\RequestException');
         $builder->setSoapMessage(new Stream(fopen('php://temp', 'r')))->getSoapHttpRequest();
     }
 
     /**
      * @test
-     * @expectedException Meng\Soap\HttpBinding\RequestException
      */
     public function soapNoMessage()
     {
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
+        $this->expectException('Meng\Soap\HttpBinding\RequestException');
         $builder->setEndpoint('http://www.endpoint.com')->getSoapHttpRequest();
     }
 
     /**
      * @test
-     * @expectedException Meng\Soap\HttpBinding\RequestException
      */
     public function resetAllAfterFailure()
     {
-        $builder = new RequestBuilder();
+        $builder = new RequestBuilder(new StreamFactory(), new RequestFactory());
         try {
             $builder->isSOAP12()->setEndpoint('http://www.endpoint.com')->getSoapHttpRequest();
         } catch (RequestException $e) {
         }
+        $this->expectException('Meng\Soap\HttpBinding\RequestException');
         $builder->setHttpMethod('GET')->getSoapHttpRequest();
     }
 }

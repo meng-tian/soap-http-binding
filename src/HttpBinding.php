@@ -2,20 +2,22 @@
 
 namespace Meng\Soap\HttpBinding;
 
-use Laminas\Diactoros\Stream;
 use Meng\Soap\Interpreter;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class HttpBinding
 {
     private $interpreter;
     private $builder;
+    private $streamFactory;
 
-    public function __construct(Interpreter $interpreter, RequestBuilder $builder)
+    public function __construct(Interpreter $interpreter, RequestBuilder $builder, StreamFactoryInterface $streamFactory)
     {
         $this->interpreter = $interpreter;
         $this->builder = $builder;
+        $this->streamFactory = $streamFactory;
     }
 
     /**
@@ -42,7 +44,7 @@ class HttpBinding
         $this->builder->setEndpoint($soapRequest->getEndpoint());
         $this->builder->setSoapAction($soapRequest->getSoapAction());
 
-        $stream = new Stream('php://temp', 'r+');
+        $stream = $this->streamFactory->createStream();
         $stream->write($soapRequest->getSoapMessage());
         $stream->rewind();
         $this->builder->setSoapMessage($stream);

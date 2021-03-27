@@ -3,7 +3,7 @@
 This library binds `SOAP 1.1` and `SOAP 1.2` messages to PSR-7 HTTP messages.
 
 ## Requirement
-PHP 5.6
+PHP 7.1
 
 ## Install
 ```
@@ -16,13 +16,17 @@ composer require meng-tian/soap-http-binding
 use Meng\Soap\HttpBinding\HttpBinding;
 use Meng\Soap\HttpBinding\RequestBuilder;
 use Meng\Soap\Interpreter;
+use Laminas\Diactoros\RequestFactory;
+use Laminas\Diactoros\StreamFactory;
 
 $interpreter = new Interpreter('http://www.webservicex.net/airport.asmx?WSDL');
-$builder = new RequestBuilder();
-$httpBinding = new HttpBinding($interpreter, $builder);
+$streamFactory = new StreamFactory();
+$requestFactory = new RequestFactory();
+$builder = new RequestBuilder($streamFactory, $requestFactory);
+$httpBinding = new HttpBinding($interpreter, $builder, $streamFactory);
 
 $request = $httpBinding->request('GetAirportInformationByCountry', [['country' => 'United Kingdom']]);
-echo \Zend\Diactoros\Request\Serializer::toString($request);
+echo \Laminas\Diactoros\Request\Serializer::toString($request);
 ```
 Output:
 ```
@@ -43,8 +47,10 @@ Host: www.webservicex.net
 use Meng\Soap\HttpBinding\HttpBinding;
 use Meng\Soap\HttpBinding\RequestBuilder;
 use Meng\Soap\Interpreter;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\Stream;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Stream;
+use Laminas\Diactoros\RequestFactory;
+use Laminas\Diactoros\StreamFactory;
 
 $response = <<<EOD
 <?xml version="1.0" encoding="utf-8"?>
@@ -63,8 +69,10 @@ $stream->rewind();
 $response = new Response($stream, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
 
 $interpreter = new Interpreter('http://www.webservicex.net/airport.asmx?WSDL');
-$builder = new RequestBuilder();
-$httpBinding = new HttpBinding($interpreter, $builder);
+$streamFactory = new StreamFactory();
+$requestFactory = new RequestFactory();
+$builder = new RequestBuilder($streamFactory, $requestFactory);
+$httpBinding = new HttpBinding($interpreter, $builder, $streamFactory);
 $response = $httpBinding->response($response, 'GetAirportInformationByCountry');
 
 print_r($response);
@@ -81,13 +89,17 @@ stdClass Object
 This library also support `SOAP 1.2` HTTP GET binding through `RequestBuilder` class :
 ```php
 use Meng\Soap\HttpBinding\RequestBuilder;
+use Laminas\Diactoros\RequestFactory;
+use Laminas\Diactoros\StreamFactory;
 
-$builder = new RequestBuilder();
+$streamFactory = new StreamFactory();
+$requestFactory = new RequestFactory();
+$builder = new RequestBuilder($streamFactory, $requestFactory);
 $request = $builder->isSOAP12()
     ->setEndpoint('http://www.endpoint.com')
     ->setHttpMethod('GET')
     ->getSoapHttpRequest();
-echo \Zend\Diactoros\Request\Serializer::toString($request);
+echo \Laminas\Diactoros\Request\Serializer::toString($request);
 ```
 Output:
 ```

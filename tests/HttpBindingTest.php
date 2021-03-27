@@ -4,10 +4,12 @@ use Meng\Soap\HttpBinding\HttpBinding;
 use Meng\Soap\HttpBinding\RequestBuilder;
 use Meng\Soap\HttpBinding\RequestException;
 use Meng\Soap\Interpreter;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\Stream;
+use Laminas\Diactoros\RequestFactory;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\StreamFactory;
+use PHPUnit\Framework\TestCase;
 
-class HttpBindingTest extends PHPUnit_Framework_TestCase
+class HttpBindingTest extends TestCase
 {
     /**
      * @test
@@ -15,9 +17,10 @@ class HttpBindingTest extends PHPUnit_Framework_TestCase
     public function soap11()
     {
         $interpreter = new Interpreter(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wsdl' . DIRECTORY_SEPARATOR . 'airport.wsdl', ['soap_version' => SOAP_1_1]);
-        $builder = new RequestBuilder();
-        $httpBinding = new HttpBinding($interpreter, $builder);
-
+        $streamFactory = new StreamFactory();
+        $requestFactory = new RequestFactory();
+        $builder = new RequestBuilder($streamFactory, $requestFactory);
+        $httpBinding = new HttpBinding($interpreter, $builder, $streamFactory);
         $request = $httpBinding->request('GetAirportInformationByCountry', [['country' => 'United Kingdom']]);
         $this->assertTrue($request instanceof \Psr\Http\Message\RequestInterface);
 
@@ -32,7 +35,7 @@ class HttpBindingTest extends PHPUnit_Framework_TestCase
 </soap:Envelope>
 EOD;
 
-        $stream = new Stream('php://memory', 'r+');
+        $stream = $streamFactory->createStream();
         $stream->write($response);
         $stream->rewind();
         $response = new Response($stream, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
@@ -46,8 +49,10 @@ EOD;
     public function soap12()
     {
         $interpreter = new Interpreter(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wsdl' . DIRECTORY_SEPARATOR . 'uszip.wsdl', ['soap_version' => SOAP_1_2]);
-        $builder = new RequestBuilder();
-        $httpBinding = new HttpBinding($interpreter, $builder);
+        $streamFactory = new StreamFactory();
+        $requestFactory = new RequestFactory();
+        $builder = new RequestBuilder($streamFactory, $requestFactory);
+        $httpBinding = new HttpBinding($interpreter, $builder, $streamFactory);
 
         $request = $httpBinding->request('GetInfoByCity', [['USCity' => 'New York']]);
         $this->assertTrue($request instanceof \Psr\Http\Message\RequestInterface);
@@ -63,7 +68,7 @@ EOD;
 </soap12:Envelope>
 EOD;
 
-        $stream = new Stream('php://memory', 'r+');
+        $stream = $streamFactory->createStream();
         $stream->write($response);
         $stream->rewind();
         $response = new Response($stream, 200, ['Content-Type' => 'Content-Type: application/soap+xml; charset=utf-8']);
@@ -73,17 +78,18 @@ EOD;
 
     /**
      * @test
-     * @expectedException Meng\Soap\HttpBinding\RequestException
      */
     public function requestBindingFailed()
     {
         $interpreter = new Interpreter(null, ['uri' => '', 'location' => '']);
         $builderMock = $this->getMockBuilder('Meng\Soap\HttpBinding\RequestBuilder')
+            ->disableOriginalConstructor()
             ->setMethods(['getSoapHttpRequest'])
             ->getMock();
         $builderMock->method('getSoapHttpRequest')->willThrowException(new RequestException());
 
-        $httpBinding = new HttpBinding($interpreter, $builderMock);
+        $httpBinding = new HttpBinding($interpreter, $builderMock, new StreamFactory);
+        $this->expectException('Meng\Soap\HttpBinding\RequestException');
         $httpBinding->request('some-function', []);
     }
 }
