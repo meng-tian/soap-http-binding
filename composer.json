@@ -10,9 +10,9 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.6.0",
         "meng-tian/php-soap-interpreter": "~1.0",
-        "laminas/laminas-diactoros": "^2.2"
+        "laminas/laminas-diactoros": "^1.5"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.8"
