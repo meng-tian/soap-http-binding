@@ -2,9 +2,9 @@
 
 namespace Meng\Soap\HttpBinding;
 
-use Laminas\Diactoros\Request;
-use Laminas\Diactoros\Stream;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -39,6 +39,20 @@ class RequestBuilder
      * @var string
      */
     private $httpMethod = 'POST';
+    /**
+     * @var StreamFactoryInterface
+     */
+    private $streamFactory;
+    /**
+     * @var RequestFactoryInterface
+     */
+    private $requestFactory;
+
+    public function __construct(StreamFactoryInterface $streamFactory, RequestFactoryInterface $requestFactory)
+    {
+        $this->streamFactory = $streamFactory;
+        $this->requestFactory = $requestFactory;
+    }
 
     /**
      * @return RequestInterface
@@ -49,12 +63,11 @@ class RequestBuilder
         $this->validate();
         $headers = $this->prepareHeaders();
         $message = $this->prepareMessage();
-        $request = new Request(
-            $this->endpoint,
-            $this->httpMethod,
-            $message,
-            $headers
-        );
+        $request = $this->requestFactory->createRequest($this->httpMethod, $this->endpoint);
+        foreach ($headers as $key => $value) {
+            $request = $request->withHeader($key, $value);
+        }
+        $request = $request->withBody($message);
         $this->unsetAll();
         return $request;
     }
@@ -201,7 +214,7 @@ class RequestBuilder
         if ($this->httpMethod == 'POST') {
             return $this->soapMessage;
         } else {
-            return new Stream('php://temp', 'r');
+            return $this->streamFactory->createStream();
         }
     }
 
