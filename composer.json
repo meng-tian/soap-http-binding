@@ -12,10 +12,10 @@
     "require": {
         "php": ">=7.1.0",
         "psr/http-factory": "~1.0",
-        "meng-tian/php-soap-interpreter": "~1.0"
+        "meng-tian/php-soap-interpreter": "~2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~7.0",
+        "phpunit/phpunit": "~7.0|~9.3",
         "laminas/laminas-diactoros": "^2.0"
     },
     "autoload": {
