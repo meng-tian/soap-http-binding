@@ -1,4 +1,4 @@
-# SOAP HTTP Binding [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/meng-tian/soap-http-binding/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/meng-tian/soap-http-binding/?branch=master) [![codecov.io](https://codecov.io/github/meng-tian/soap-http-binding/coverage.svg?branch=master)](https://codecov.io/github/meng-tian/soap-http-binding?branch=master)
+# SOAP HTTP Binding [![codecov.io](https://codecov.io/github/meng-tian/soap-http-binding/coverage.svg?branch=master)](https://codecov.io/github/meng-tian/soap-http-binding?branch=master) ![workflow](https://github.com/meng-tian/soap-http-binding/actions/workflows/main.yaml/badge.svg)
 
 This library binds `SOAP 1.1` and `SOAP 1.2` messages to PSR-7 HTTP messages.
 
